@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EstudaFlow — Plataforma de Estudos (PC & Mobile)</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tipografia Moderna: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#EEF2FF',
+              100: '#E0E7FF',
+              200: '#C7D2FE',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              900: '#312E81',
+            }
+          },
+          boxShadow: {
+            'soft': '0 2px 14px -2px rgba(15, 23, 42, 0.07), 0 1px 4px -1px rgba(15, 23, 42, 0.04)',
+            'soft-dark': '0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 1px 4px -1px rgba(0, 0, 0, 0.25)',
+            'phone': '0 25px 60px -15px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(15, 23, 42, 0.1)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Aumento proporcional da fonte base e escala geral para melhor leitura */
+    html {
+      font-size: 17px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F1F5F9;
+      background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+      background-size: 22px 22px;
+      color: #0F172A;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    html.dark body {
+      background-color: #070B14;
+      background-image: radial-gradient(#1E293B 1px, transparent 1px);
+      color: #F1F5F9;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Barras de rolagem sutis e elegantes */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    html.dark .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+    html.dark .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Animação suave do anel SVG do Pomodoro */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Animações suaves de entrada */
+    .fade-in-up {
+      animation: fadeInUp 0.3s ease-out;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-100 selection:text-indigo-800 dark:selection:bg-indigo-500/30 dark:selection:text-indigo-200">
+
+  <!-- ===================================================================== -->
+  <!-- 0. TELA INICIAL COMPLETA (PORTAL DE ENTRADA + LOGIN COM/SEM SENHA)    -->
+  <!-- ===================================================================== -->
+  <section id="welcome-screen" class="min-h-screen flex flex-col justify-between bg-gradient-to-br from-slate-50 via-indigo-50/40 to-slate-100 dark:from-[#070B14] dark:via-[#0D1426] dark:to-[#090E1A] transition-colors duration-300">
+    
+    <!-- Barra Superior da Tela Inicial -->
+    <header class="w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <span class="font-display font-extrabold text-xl text-slate-900 dark:text-white tracking-tight block leading-none">EstudaFlow</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Organização & Foco Inteligente</span>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+          <a href="#recursos-inicio" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Recursos</a>
+          <a href="#como-funciona-inicio" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Como Funciona</a>
+          <a href="#acesso-rapido-box" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Acessar App</a>
+        </nav>
+
+        <div class="flex items-center gap-2.5">
+          <button onclick="toggleDarkMode()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold transition cursor-pointer">
+            <span class="theme-icon-sync">🌙</span>
+            <span class="theme-label-sync hidden sm:inline">Modo Escuro</span>
+          </button>
+          <button onclick="enterAppWithoutPassword()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer">
+            Entrar Direto →
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal da Tela Inicial -->
+    <div class="max-w-7xl mx-auto w-full px-4 sm:px-8 py-10 lg:py-14 space-y-14">
+      
+      <!-- Hero + Box de Login (Com ou Sem Senha) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <!-- Coluna Esquerda: Apresentação Completa -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/80 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold">
+            <span>✨ Novo: Sincronização PC + Celular e Modo Escuro</span>
+          </div>
+
+          <h1 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+            Organize seus estudos, domine suas revisões e mantenha o <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">foco todos os dias.</span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+            O <strong>EstudaFlow</strong> reúne Timer Pomodoro, Cronograma Semanal, Metas Diárias e Flashcards de Revisão Espaçada em uma única plataforma leve — acessível no computador ou no celular, com ou sem senha.
+          </p>
+
+          <!-- Destaques Rápidos -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5 pt-2">
+            <div class="bg-white/90 dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+              <p class="font-display font-extrabold text-xl text-indigo-600 dark:text-indigo-400">25/5 min</p>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Pomodoro Integrado</p>
+            </div>
+            <div class="bg-white/90 dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+              <p class="font-display font-extrabold text-xl text-emerald-600 dark:text-emerald-400">91% SRS</p>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Revisão Espaçada</p>
+            </div>
+            <div class="col-span-2 sm:col-span-1 bg-white/90 dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+              <p class="font-display font-extrabold text-xl text-amber-500">PC & App</p>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">100% Sincronizado</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Card de Acesso (Login com Senha OU Acesso Livre sem Senha) -->
+        <div id="acesso-rapido-box" class="lg:col-span-5">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 shadow-xl dark:shadow-soft-dark space-y-5">
+            
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">Acessar EstudaFlow</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Entre com sua conta ou acesse livremente sem senha</p>
+              </div>
+              <span class="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl">🔐</span>
+            </div>
+
+            <!-- Seletor de Modo de Entrada -->
+            <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/70 dark:border-slate-700/70">
+              <button type="button" id="tab-login-senha" onclick="setAuthMode('password')" class="py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm">
+                🔑 Com Login e Senha
+              </button>
+              <button type="button" id="tab-login-livre" onclick="setAuthMode('nopassword')" class="py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                ⚡ Sem Senha (Livre)
+              </button>
+            </div>
+
+            <!-- Formulário de Entrada -->
+            <form onsubmit="handleWelcomeLogin(event)" class="space-y-4">
+              <div>
+                <label for="login-user-input" class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
+                  Seu Nome ou E-mail de Acesso
+                </label>
+                <input type="text" id="login-user-input" value="Mariana Silva" placeholder="Ex: Mariana Silva ou mariana@email.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500" required />
+              </div>
+
+              <!-- Campo de Senha (Opcional ou Obrigatório conforme escolha) -->
+              <div id="password-field-group" class="space-y-1.5 transition-all">
+                <div class="flex items-center justify-between">
+                  <label for="login-pass-input" class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    Senha <span id="pass-optional-badge" class="text-xs font-normal text-slate-400">(opcional — deixe vazio se preferir)</span>
+                  </label>
+                  <button type="button" onclick="togglePasswordVisibility()" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                    Mostrar/Ocultar
+                  </button>
+                </div>
+                <div class="relative">
+                  <input type="password" id="login-pass-input" placeholder="Digite sua senha ou deixe em branco..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500" />
+                </div>
+                <p id="login-error-msg" class="hidden text-xs font-semibold text-rose-500 mt-1"></p>
+              </div>
+
+              <!-- Opção de Lembrar / Exigir Senha -->
+              <div class="flex items-center justify-between text-xs sm:text-sm pt-0.5">
+                <label class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                  <input type="checkbox" id="login-require-pass-check" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+                  <span>Exigir senha nos próximos acessos</span>
+                </label>
+              </div>
+
+              <!-- Botão Principal de Entrar -->
+              <button type="submit" id="btn-submit-login" class="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                <span>🚀 Entrar no EstudaFlow</span>
+              </button>
+            </form>
+
+            <div class="relative flex items-center py-1">
+              <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+              <span class="shrink mx-3 text-xs font-semibold uppercase tracking-wider text-slate-400">ou acesso instantâneo</span>
+              <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+
+            <!-- Botão Direto sem Senha -->
+            <button type="button" onclick="enterAppWithoutPassword()" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-semibold text-xs sm:text-sm border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>⚡ Entrar sem Senha (Modo Visitante / Livre)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção Completa de Recursos na Tela Inicial -->
+      <div id="recursos-inicio" class="pt-4 space-y-6">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white">Tudo o que você precisa na mesma plataforma</h2>
+          <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1.5">Ferramentas integradas para planejar, executar e revisar seus estudos sem distrações.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+            <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl mb-3">⏱️</div>
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Timer Pomodoro</h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Ciclos de foco de 25 min e pausas de 5 min com progresso visual e contador diário.</p>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mb-3">✅</div>
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Metas & Tarefas</h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Checklist organizado por matéria com cálculo automático da sua meta diária.</p>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+            <div class="w-11 h-11 rounded-xl bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400 flex items-center justify-center text-xl mb-3">🧠</div>
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Flashcards SRS</h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Revisão espaçada inteligente para fixar conteúdos de longo prazo em poucos minutos.</p>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-soft">
+            <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl mb-3">👤</div>
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Perfil Personalizável</h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Configure seu nome, curso, meta de horas, senha opcional e tema escuro a qualquer momento.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Como Funciona (PC + Mobile) -->
+      <div id="como-funciona-inicio" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-soft flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 max-w-2xl">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Multi-dispositivo em Tempo Real</span>
+          <h3 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">Visualize no Computador, no Celular ou Lado a Lado</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Dentro do EstudaFlow você pode alternar entre a visão Desktop completa, o App Mobile ou visualizar os dois simultaneamente com sincronização instantânea.</p>
+        </div>
+        <button onclick="enterAppWithoutPassword()" class="px-6 py-3.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-700 text-white font-bold text-sm shrink-0 transition cursor-pointer shadow-md">
+          Abrir Plataforma Agora →
+        </button>
+      </div>
+    </div>
+
+    <!-- Rodapé da Tela Inicial -->
+    <footer class="border-t border-slate-200/80 dark:border-slate-800 py-5 px-4 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+      EstudaFlow • Plataforma de Produtividade & Estudos • PC & Mobile
+    </footer>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- 1. APLICAÇÃO PRINCIPAL (OCULTA ATÉ O USUÁRIO ENTRAR PELA TELA INICIAL) -->
+  <!-- ===================================================================== -->
+  <div id="app-shell" class="hidden min-h-screen flex-col">
+
+    <!-- BARRA SUPERIOR DE CONTROLE DO PROTÓTIPO (DEVICE + TEMA + PERFIL + SAIR) -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md text-white border-b border-slate-800 shadow-lg">
+      <div class="max-w-[1800px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Identificação -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-inner">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-bold text-sm sm:text-base tracking-tight">EstudaFlow</span>
+              <span id="header-auth-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Acesso Livre</span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Estado sincronizado em tempo real entre PC e Celular</p>
+          </div>
+        </div>
+
+        <!-- Botões de Alternância de Tela (Device Switcher) + Modo Escuro + Perfil -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700/80 shadow-inner" role="group" aria-label="Alternar visualização de dispositivo">
+            <button id="btn-mode-desktop" onclick="setViewMode('desktop')" class="device-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer">
+              <span>💻</span>
+              <span>Tela PC</span>
+            </button>
+            <button id="btn-mode-mobile" onclick="setViewMode('mobile')" class="device-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer">
+              <span>📱</span>
+              <span>Celular</span>
+            </button>
+            <button id="btn-mode-split" onclick="setViewMode('split')" class="device-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer">
+              <span>🖥️📱</span>
+              <span>Lado a Lado</span>
+            </button>
+          </div>
+
+          <!-- Botão Modo Escuro -->
+          <button onclick="toggleDarkMode()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/80 text-xs sm:text-sm font-semibold transition cursor-pointer" aria-label="Alternar modo escuro">
+            <span class="theme-icon-sync">🌙</span>
+            <span class="theme-label-sync hidden md:inline">Modo Escuro</span>
+          </button>
+
+          <!-- Botão Rápido de Perfil -->
+          <button onclick="openProfileView()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-sm">
+            <span class="user-avatar-initials w-6 h-6 rounded-full bg-white/20 text-xs font-bold flex items-center justify-center">MS</span>
+            <span class="hidden sm:inline">Perfil</span>
+          </button>
+
+          <!-- Botão Voltar para Tela Inicial / Sair -->
+          <button onclick="returnToWelcomeScreen()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/40 text-slate-300 border border-slate-700/80 text-xs sm:text-sm font-semibold transition cursor-pointer" title="Voltar para a Tela Inicial">
+            <span>🚪</span>
+            <span class="hidden lg:inline">Tela Inicial</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- 2. ÁREA PRINCIPAL DO PALCO (STAGE)                                    -->
+    <!-- ===================================================================== -->
+    <main id="prototype-stage" class="flex-1 w-full max-w-[1800px] mx-auto p-3 sm:p-6 flex flex-col lg:flex-row items-start justify-center gap-6 transition-all duration-300">
+
+      <!-- =================================================================== -->
+      <!-- A. VIEWPORT DESKTOP (TELA DE PC)                                    -->
+      <!-- =================================================================== -->
+      <section id="desktop-wrapper" class="w-full flex-1 min-w-0 transition-all duration-300">
+        <!-- Moldura de Janela SaaS / Browser -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col transition-colors duration-200">
+          
+          <!-- Barra Superior do Navegador Simulado -->
+          <div class="bg-slate-50 dark:bg-slate-950/90 border-b border-slate-200/80 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+            </div>
+            <div class="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700/80 rounded-lg px-3.5 py-1 text-xs text-slate-500 dark:text-slate-400 w-64 sm:w-96 justify-center">
+              <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span id="desktop-browser-url" class="truncate font-medium text-slate-600 dark:text-slate-300">app.estudaflow.com.br/dashboard</span>
+            </div>
+            <div class="text-xs font-medium text-slate-400 hidden sm:block">Desktop HD</div>
+          </div>
+
+          <!-- Corpo da Aplicação Desktop -->
+          <div class="flex flex-col md:flex-row min-h-[820px] bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-200">
+            
+            <!-- MENU LATERAL ESQUERDO (SIDEBAR) -->
+            <aside class="w-full md:w-68 lg:w-72 bg-white dark:bg-slate-900 border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 flex flex-col justify-between shrink-0 transition-colors duration-200">
+              <div>
+                <!-- Logo EstudaFlow -->
+                <div class="flex items-center justify-between md:justify-start gap-2.5 px-2 py-1.5 mb-5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-indigo-950/60">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="font-display font-bold text-lg text-slate-900 dark:text-white tracking-tight block leading-none">EstudaFlow</span>
+                      <span class="text-xs text-slate-400 font-medium mt-0.5 block">Workspace Pro</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Links de Navegação -->
+                <nav class="flex md:flex-col gap-1.5 overflow-x-auto no-scrollbar pb-2 md:pb-0" aria-label="Menu principal desktop">
+                  <button onclick="setDesktopTab('dashboard')" data-dtab="dashboard" class="desktop-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    <span>Dashboard</span>
+                  </button>
+                  <button onclick="setDesktopTab('cronograma')" data-dtab="cronograma" class="desktop-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span>Cronograma Semanal</span>
+                  </button>
+                  <button onclick="setDesktopTab('materias')" data-dtab="materias" class="desktop-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <span>Minhas Matérias</span>
+                  </button>
+                  <button onclick="setDesktopTab('revisoes')" data-dtab="revisoes" class="desktop-nav-btn flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <span class="flex items-center gap-3">
+                      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                      <span>Revisões</span>
+                    </span>
+                    <span id="sidebar-flashcard-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300">14</span>
+                  </button>
+                  <button onclick="setDesktopTab('desempenho')" data-dtab="desempenho" class="desktop-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    <span>Desempenho</span>
+                  </button>
+                  <button onclick="setDesktopTab('perfil')" data-dtab="perfil" class="desktop-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    <span>Meu Perfil & Config.</span>
+                  </button>
+                </nav>
+              </div>
+
+              <!-- Resumo de Ofensiva + Card Clicável de Perfil na Sidebar -->
+              <div class="hidden md:block mt-6 space-y-3.5">
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50/70 to-amber-100/50 dark:from-amber-500/15 dark:via-orange-500/10 dark:to-amber-500/5 border border-amber-200/80 dark:border-amber-500/25">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">Ofensiva</span>
+                    <span class="text-xs font-semibold text-amber-700 dark:text-amber-300 bg-white/80 dark:bg-slate-900/70 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-500/30">Recorde: 19d</span>
+                  </div>
+                  <div class="flex items-center gap-2 mb-2.5">
+                    <span class="text-2xl">🔥</span>
+                    <div>
+                      <p class="font-display font-extrabold text-base text-slate-900 dark:text-white leading-tight">12 dias seguidos</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Continue assim hoje!</p>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-7 gap-1 text-center">
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">S</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">T</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Q</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Q</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">S</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">S</span><span class="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold">✓</span></div>
+                    <div class="flex flex-col items-center gap-1"><span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">D</span><span class="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-500/40 text-xs flex items-center justify-center font-bold">•</span></div>
+                  </div>
+                </div>
+
+                <!-- Perfil Clicável (Abre Meu Perfil & Configurações) -->
+                <button onclick="setDesktopTab('perfil')" class="w-full text-left flex items-center justify-between gap-2.5 p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 hover:bg-indigo-50/80 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 transition cursor-pointer group">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div id="sidebar-avatar-circle" class="user-avatar-initials w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 text-white font-display font-bold text-xs flex items-center justify-center shrink-0">
+                      MS
+                    </div>
+                    <div class="min-w-0">
+                      <p class="user-fullname-sync text-sm font-bold text-slate-800 dark:text-slate-100 truncate">Mariana Silva</p>
+                      <p class="user-course-sync text-xs text-slate-500 dark:text-slate-400 truncate">Ciência da Computação</p>
+                    </div>
+                  </div>
+                  <span class="text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm pr-1" title="Configurações do Perfil">⚙️</span>
+                </button>
+              </div>
+            </aside>
+
+            <!-- CONTEÚDO PRINCIPAL DESKTOP -->
+            <div class="flex-1 p-5 sm:p-6 overflow-y-auto custom-scroll space-y-6">
+              
+              <!-- Cabeçalho com Saudação, Data e Meta Diária -->
+              <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-soft dark:shadow-soft-dark flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
+                    <span>📅 Segunda-feira, 23 de Novembro</span>
+                    <span>•</span>
+                    <span class="text-indigo-600 dark:text-indigo-400 font-semibold">Semana de Foco #14</span>
+                  </div>
+                  <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white tracking-tight">
+                    Olá, <span class="user-firstname-sync">Mariana</span>! Pronta para avançar hoje? 👋
+                  </h1>
+                </div>
+
+                <!-- Barra de Progresso da Meta Diária -->
+                <div class="w-full xl:w-96 bg-slate-50 dark:bg-slate-800/70 rounded-xl p-3.5 border border-slate-200/70 dark:border-slate-700/70">
+                  <div class="flex items-center justify-between text-xs sm:text-sm mb-1.5">
+                    <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Meta Diária de Estudo
+                    </span>
+                    <span id="desktop-goal-percent" class="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/20 px-2 py-0.5 rounded-md">60%</span>
+                  </div>
+                  <div class="w-full h-2.5 bg-slate-200/80 dark:bg-slate-700 rounded-full overflow-hidden mb-1.5">
+                    <div id="desktop-goal-bar" class="h-full bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 60%"></div>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span id="desktop-goal-text" class="font-medium text-slate-700 dark:text-slate-300">3h 00m de 5h 00m concluídas</span>
+                    <span id="desktop-tasks-summary">2/5 tarefas</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 1: DASHBOARD PRINCIPAL                                 -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-dashboard" class="space-y-6 fade-in-up">
+                
+                <!-- Linha Superior: Pomodoro + Revisão Espaçada -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  
+                  <!-- CARD: TIMER POMODORO INTERATIVO (7 colunas) -->
+                  <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-soft dark:shadow-soft-dark flex flex-col sm:flex-row items-center justify-between gap-5 transition-colors">
+                    <div class="flex items-center gap-4">
+                      <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                        <svg class="w-28 h-28" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="42" fill="none" class="stroke-slate-200 dark:stroke-slate-800" stroke-width="7" />
+                          <circle id="desktop-pomo-ring" class="progress-ring-circle" cx="50" cy="50" r="42" fill="none" stroke="#4F46E5" stroke-width="7" stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="0" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                          <span id="desktop-pomo-time" class="font-display font-extrabold text-2xl text-slate-900 dark:text-white tracking-tight">25:00</span>
+                          <span id="desktop-pomo-status-label" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Foco</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                          <button onclick="setPomodoroMode('focus')" id="desktop-btn-mode-focus" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                            🎯 Foco (25:00)
+                          </button>
+                          <button onclick="setPomodoroMode('break')" id="desktop-btn-mode-break" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                            ☕ Pausa (05:00)
+                          </button>
+                        </div>
+                        <h2 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">Sessão Pomodoro</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Ciclo atual: <strong class="text-slate-700 dark:text-slate-200" id="desktop-pomo-cycles">3 de 4 sessões</strong> hoje</p>
+                      </div>
+                    </div>
+
+                    <div class="flex sm:flex-col items-center gap-2.5 w-full sm:w-auto">
+                      <button onclick="togglePomodoro()" id="desktop-pomo-toggle" class="flex-1 sm:w-36 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>▶ Iniciar</span>
+                      </button>
+                      <button onclick="resetPomodoro()" class="flex-1 sm:w-36 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>↻ Resetar</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- CARD: REVISÃO ESPAÇADA (5 colunas) -->
+                  <div class="lg:col-span-5 bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 dark:from-indigo-950 dark:via-indigo-900 dark:to-violet-950 rounded-2xl border border-indigo-700/30 p-5 sm:p-6 text-white shadow-soft dark:shadow-soft-dark flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                    
+                    <div>
+                      <div class="flex items-center justify-between mb-2.5">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/15 text-indigo-100">
+                          🧠 Revisão Espaçada
+                        </span>
+                        <span class="text-xs text-indigo-200 font-medium">Algoritmo SRS</span>
+                      </div>
+                      <h2 class="font-display font-extrabold text-lg sm:text-xl leading-snug">
+                        <span id="desktop-flashcard-count">14</span> flashcards para revisar hoje
+                      </h2>
+                      <p class="text-xs sm:text-sm text-indigo-200 mt-1">Retenção média atual: <strong class="text-emerald-300">91%</strong> • Tempo est.: ~6 min</p>
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-2">
+                      <button onclick="openFlashcardModal()" class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-indigo-50 text-indigo-900 font-bold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+                        <span>⚡ Iniciar Revisão Rápida</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Linha Inferior: Metas de Hoje + Cronograma Semanal -->
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+                  
+                  <!-- QUADRO 1: LISTA DE TAREFAS / METAS DE HOJE (5 colunas) -->
+                  <div class="xl:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-soft dark:shadow-soft-dark flex flex-col justify-between transition-colors">
+                    <div class="flex flex-col h-full">
+                      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100 dark:border-slate-800">
+                        <div>
+                          <h2 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>✅ Metas de Hoje</span>
+                            <span id="desktop-task-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">2/5</span>
+                          </h2>
+                          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Marque tarefas concluídas ou adicione novas</p>
+                        </div>
+                      </div>
+
+                      <!-- Formulário para Adicionar Nova Tarefa -->
+                      <form onsubmit="handleAddTask(event, 'desktop')" class="mb-4 bg-slate-50 dark:bg-slate-800/70 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+                        <input type="text" id="desktop-new-task-input" placeholder="Nova meta de estudo (ex: Revisar matrizes)..." class="w-full bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder:text-slate-400" required />
+                        <div class="flex items-center gap-2">
+                          <select id="desktop-new-task-subject" aria-label="Selecionar matéria" class="flex-1 bg-white dark:bg-slate-900 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-indigo-500">
+                            <option value="Matemática">📐 Matemática</option>
+                            <option value="Programação">💻 Programação</option>
+                            <option value="História">🏛️ História</option>
+                            <option value="Inglês">🌎 Inglês</option>
+                            <option value="Redação">✍️ Redação</option>
+                          </select>
+                          <button type="submit" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold transition shrink-0 cursor-pointer">
+                            + Adicionar
+                          </button>
+                        </div>
+                      </form>
+
+                      <!-- Lista Dinâmica de Tarefas Desktop -->
+                      <div id="desktop-task-list" class="space-y-2.5 flex-1 max-h-[340px] overflow-y-auto custom-scroll pr-1">
+                        <!-- Renderizado via JS -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- QUADRO 2: GRADE DE CRONOGRAMA SEMANAL (SEG A SEX) (7 colunas) -->
+                  <div class="xl:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-soft dark:shadow-soft-dark flex flex-col justify-between transition-colors">
+                    <div class="flex flex-col h-full">
+                      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-100 dark:border-slate-800">
+                        <div>
+                          <h2 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">🗓️ Cronograma Semanal (Seg a Sex)</h2>
+                          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Clique em um bloco para marcar como concluído</p>
+                        </div>
+                        <button onclick="setDesktopTab('cronograma')" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                          Ver grade completa →
+                        </button>
+                      </div>
+
+                      <!-- Grade Semanal Compacta -->
+                      <div id="desktop-dashboard-schedule" class="grid grid-cols-1 sm:grid-cols-5 gap-3 flex-1">
+                        <!-- Renderizado via JS -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 2: CRONOGRAMA SEMANAL COMPLETO                         -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-cronograma" class="hidden space-y-6 fade-in-up">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-soft dark:shadow-soft-dark space-y-5">
+                  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <div>
+                      <h2 class="font-display font-extrabold text-xl text-slate-900 dark:text-white">🗓️ Planejamento Semanal Detalhado</h2>
+                      <p class="text-sm text-slate-500 dark:text-slate-400">Adicione blocos de estudo por dia e acompanhe sua distribuição semanal.</p>
+                    </div>
+                    <form onsubmit="handleAddScheduleBlock(event)" class="flex flex-wrap items-center gap-2">
+                      <select id="sched-day" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100">
+                        <option value="Seg">Segunda</option>
+                        <option value="Ter">Terça</option>
+                        <option value="Qua">Quarta</option>
+                        <option value="Qui">Quinta</option>
+                        <option value="Sex">Sexta</option>
+                      </select>
+                      <select id="sched-subject" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100">
+                        <option value="Matemática">📐 Matemática</option>
+                        <option value="Programação">💻 Programação</option>
+                        <option value="História">🏛️ História</option>
+                        <option value="Inglês">🌎 Inglês</option>
+                        <option value="Redação">✍️ Redação</option>
+                      </select>
+                      <input type="text" id="sched-time" value="19:00 - 20:30" placeholder="Horário" class="w-32 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100" required />
+                      <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold cursor-pointer">+ Novo Bloco</button>
+                    </form>
+                  </div>
+
+                  <div id="desktop-full-schedule" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <!-- Renderizado via JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 3: MINHAS MATÉRIAS                                     -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-materias" class="hidden space-y-6 fade-in-up">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="desktop-subjects-grid">
+                  <!-- Renderizado via JS -->
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 4: REVISÕES (FLASHCARDS SRS)                           -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-revisoes" class="hidden space-y-6 fade-in-up">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-soft dark:shadow-soft-dark flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div class="space-y-2">
+                    <span class="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold">Algoritmo de Repetição Espaçada</span>
+                    <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">Baralho de Revisão Diária</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Você possui <strong class="text-indigo-600 dark:text-indigo-400" id="revisoes-view-count">14</strong> cartões pendentes hoje. Revise agora para manter sua taxa de retenção acima de 90%.</p>
+                  </div>
+                  <button onclick="openFlashcardModal()" class="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition cursor-pointer shrink-0">
+                    ⚡ Abrir Sessão de Flashcards
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+                    <p class="text-xs font-bold uppercase text-slate-400">Cartões Dominados</p>
+                    <p class="font-display font-extrabold text-3xl text-emerald-500 mt-1">128</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Intervalo > 21 dias</p>
+                  </div>
+                  <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+                    <p class="text-xs font-bold uppercase text-slate-400">Em Aprendizagem</p>
+                    <p class="font-display font-extrabold text-3xl text-amber-500 mt-1">34</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Revisão a cada 1-4 dias</p>
+                  </div>
+                  <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+                    <p class="text-xs font-bold uppercase text-slate-400">Taxa de Acerto</p>
+                    <p class="font-display font-extrabold text-3xl text-indigo-600 dark:text-indigo-400 mt-1">91,4%</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">+3,2% esta semana</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 5: DESEMPENHO                                          -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-desempenho" class="hidden space-y-6 fade-in-up">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-soft dark:shadow-soft-dark space-y-6">
+                  <div>
+                    <h2 class="font-display font-extrabold text-xl text-slate-900 dark:text-white">📊 Horas Estudadas na Semana</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Comparativo diário em relação à sua meta de <strong class="user-goal-hours-sync">5h</strong>/dia.</p>
+                  </div>
+
+                  <div class="grid grid-cols-7 gap-3 items-end h-52 pt-6 px-2 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">4.5h</span>
+                      <div class="w-full max-w-[44px] bg-indigo-500 rounded-t-xl" style="height: 82%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Seg</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">5.2h</span>
+                      <div class="w-full max-w-[44px] bg-emerald-500 rounded-t-xl" style="height: 95%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Ter</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">3.8h</span>
+                      <div class="w-full max-w-[44px] bg-indigo-500 rounded-t-xl" style="height: 70%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Qua</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">5.0h</span>
+                      <div class="w-full max-w-[44px] bg-emerald-500 rounded-t-xl" style="height: 90%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Qui</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">4.1h</span>
+                      <div class="w-full max-w-[44px] bg-indigo-500 rounded-t-xl" style="height: 75%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Sex</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">3.0h</span>
+                      <div class="w-full max-w-[44px] bg-indigo-400 rounded-t-xl" style="height: 55%"></div>
+                      <span class="text-xs font-semibold text-slate-500">Sáb</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 h-full justify-end">
+                      <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">Hoje</span>
+                      <div class="w-full max-w-[44px] bg-gradient-to-t from-indigo-600 to-violet-500 rounded-t-xl" style="height: 62%"></div>
+                      <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">Dom</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =========================================================== -->
+              <!-- VIEW 6: MEU PERFIL & CONFIGURAÇÕES BÁSICAS (NOVO!)          -->
+              <!-- =========================================================== -->
+              <div id="desktop-view-perfil" class="hidden space-y-6 fade-in-up">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-soft dark:shadow-soft-dark space-y-6">
+                  
+                  <!-- Cabeçalho do Perfil -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-4">
+                      <div id="profile-large-avatar" class="user-avatar-initials w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-display font-extrabold text-xl flex items-center justify-center shadow-lg">
+                        MS
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <h2 class="user-fullname-sync font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">Mariana Silva</h2>
+                          <span id="profile-security-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">Acesso Livre</span>
+                        </div>
+                        <p class="user-email-sync text-sm text-slate-500 dark:text-slate-400">mariana.silva@estudaflow.com.br</p>
+                      </div>
+                    </div>
+
+                    <button onclick="returnToWelcomeScreen()" class="px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 border border-rose-200/80 dark:border-rose-500/30 text-xs sm:text-sm font-bold transition cursor-pointer">
+                      🚪 Sair / Voltar à Tela Inicial
+                    </button>
+                  </div>
+
+                  <!-- Formulário de Configurações Básicas de Perfil -->
+                  <form onsubmit="saveProfileSettings(event)" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Coluna 1: Dados Pessoais -->
+                    <div class="space-y-4">
+                      <h3 class="font-display font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>👤 Informações Básicas</span>
+                      </h3>
+
+                      <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome Completo</label>
+                        <input type="text" id="prof-input-name" value="Mariana Silva" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" required />
+                      </div>
+
+                      <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">E-mail ou Login</label>
+                        <input type="text" id="prof-input-email" value="mariana.silva@estudaflow.com.br" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" required />
+                      </div>
+
+                      <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Curso ou Objetivo Principal</label>
+                        <input type="text" id="prof-input-course" value="Ciência da Computação" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" />
+                      </div>
+
+                      <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Cor do Avatar</label>
+                        <div class="flex items-center gap-2.5 pt-1">
+                          <button type="button" onclick="setAvatarColor('from-indigo-600 to-purple-600')" class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-slate-900 cursor-pointer"></button>
+                          <button type="button" onclick="setAvatarColor('from-emerald-500 to-teal-600')" class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 cursor-pointer"></button>
+                          <button type="button" onclick="setAvatarColor('from-rose-500 to-orange-500')" class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-orange-500 cursor-pointer"></button>
+                          <button type="button" onclick="setAvatarColor('from-sky-500 to-blue-600')" class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 cursor-pointer"></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Coluna 2: Preferências & Segurança de Acesso -->
+                    <div class="space-y-4">
+                      <h3 class="font-display font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>⚙️ Preferências & Acesso</span>
+                      </h3>
+
+                      <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Meta Diária de Estudo (Horas)</label>
+                        <select id="prof-input-goal" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+                          <option value="2">2 horas por dia</option>
+                          <option value="3">3 horas por dia</option>
+                          <option value="4">4 horas por dia</option>
+                          <option value="5" selected>5 horas por dia</option>
+                          <option value="6">6 horas por dia</option>
+                          <option value="8">8 horas por dia</option>
+                        </select>
+                      </div>
+
+                      <!-- Segurança: Senha Opcional -->
+                      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <p class="text-sm font-bold text-slate-800 dark:text-slate-100">Exigir Senha no Login</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Desative para entrar livremente sem senha</p>
+                          </div>
+                          <input type="checkbox" id="prof-require-password" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                        </div>
+
+                        <div>
+                          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Definir ou Alterar Senha</label>
+                          <input type="password" id="prof-input-password" placeholder="Deixe vazio para manter sem senha" class="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" />
+                        </div>
+                      </div>
+
+                      <!-- Switch Modo Escuro e Sons -->
+                      <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80">
+                        <div>
+                          <p class="text-sm font-bold text-slate-800 dark:text-slate-100">Aparência (Modo Escuro)</p>
+                          <p class="text-xs text-slate-500 dark:text-slate-400">Alternar entre tema claro e escuro</p>
+                        </div>
+                        <button type="button" onclick="toggleDarkMode()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold cursor-pointer">
+                          Alternar Tema
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <div class="lg:col-span-2 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <span id="profile-save-feedback" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 opacity-0 transition-opacity">
+                        ✓ Configurações salvas e sincronizadas!
+                      </span>
+                      <button type="submit" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition cursor-pointer">
+                        💾 Salvar Configurações do Perfil
+                      </button>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- B. VIEWPORT MOBILE (TELA DE CELULAR INTERATIVA)                     -->
+      <!-- =================================================================== -->
+      <aside id="mobile-wrapper" class="w-full lg:w-[405px] shrink-0 flex flex-col items-center transition-all duration-300">
+        
+        <!-- Moldura de Smartphone -->
+        <div class="w-full max-w-[405px] bg-slate-900 rounded-[3rem] p-3 shadow-phone border-[3px] border-slate-800 relative">
+          
+          <!-- Dynamic Island / Notch -->
+          <div class="w-28 h-6 bg-black rounded-full mx-auto mb-1.5 flex items-center justify-end px-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-950 border border-indigo-700/40"></span>
+          </div>
+
+          <!-- Tela Interna do Celular -->
+          <div class="bg-[#F8FAFC] dark:bg-[#0B1120] rounded-[2.3rem] overflow-hidden flex flex-col h-[780px] border border-slate-200/20 transition-colors duration-200">
+            
+            <!-- Status Bar iOS/Android -->
+            <div class="px-6 pt-2 pb-1.5 flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900">
+              <span>09:41</span>
+              <div class="flex items-center gap-1.5">
+                <span>5G</span>
+                <span>🔋 100%</span>
+              </div>
+            </div>
+
+            <!-- Header Mobile -->
+            <div class="px-5 py-3 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 block">EstudaFlow App</span>
+                <h2 class="font-display font-extrabold text-base text-slate-900 dark:text-white">Olá, <span class="user-firstname-sync">Mariana</span> 👋</h2>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-sm cursor-pointer" title="Tema">
+                  <span class="theme-icon-sync">🌙</span>
+                </button>
+                <button onclick="setMobileTab('perfil')" class="user-avatar-initials w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 text-white font-display font-bold text-xs flex items-center justify-center cursor-pointer shadow-sm" title="Meu Perfil">
+                  MS
+                </button>
+              </div>
+            </div>
+
+            <!-- Conteúdo Rolável Mobile -->
+            <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-4">
+              
+              <!-- TAB MOBILE 1: INÍCIO -->
+              <div id="mobile-view-inicio" class="space-y-4">
+                
+                <!-- Card Compacto Meta + Pomodoro -->
+                <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-4 text-white shadow-md space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-xs uppercase tracking-wider font-bold text-indigo-200">Foco Atual</span>
+                      <p id="mobile-pomo-time" class="font-display font-extrabold text-2xl leading-tight">25:00</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="togglePomodoro()" id="mobile-pomo-toggle" class="px-3.5 py-2 rounded-xl bg-white text-indigo-900 font-bold text-xs shadow cursor-pointer">
+                        ▶ Iniciar
+                      </button>
+                      <button onclick="resetPomodoro()" class="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold cursor-pointer">
+                        ↻
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs mb-1 text-indigo-100">
+                      <span>Meta diária</span>
+                      <span id="mobile-goal-percent" class="font-bold">60%</span>
+                    </div>
+                    <div class="w-full h-2 bg-black/20 rounded-full overflow-hidden">
+                      <div id="mobile-goal-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 60%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card Rápido Flashcards Mobile -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-soft">
+                  <div>
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 block">🧠 Revisão Espaçada</span>
+                    <p class="text-sm font-bold text-slate-900 dark:text-white"><span id="mobile-flashcard-count">14</span> cards pendentes</p>
+                  </div>
+                  <button onclick="openFlashcardModal()" class="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-xs cursor-pointer">
+                    Revisar ⚡
+                  </button>
+                </div>
+
+                <!-- Adicionar Tarefa Mobile -->
+                <form onsubmit="handleAddTask(event, 'mobile')" class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-2 shadow-soft">
+                  <div class="flex gap-2">
+                    <input type="text" id="mobile-new-task-input" placeholder="Nova meta rápida..." class="flex-1 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none" required />
+                    <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold cursor-pointer">+</button>
+                  </div>
+                </form>
+
+                <!-- Lista de Tarefas Mobile Sincronizada -->
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between px-1">
+                    <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">✅ Metas de Hoje</h3>
+                    <span id="mobile-task-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">2/5</span>
+                  </div>
+                  <div id="mobile-task-list" class="space-y-2">
+                    <!-- Renderizado via JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB MOBILE 2: AGENDA -->
+              <div id="mobile-view-agenda" class="hidden space-y-3">
+                <h3 class="font-display font-bold text-base text-slate-900 dark:text-white px-1">🗓️ Agenda da Semana</h3>
+                <div id="mobile-schedule-list" class="space-y-2.5">
+                  <!-- Renderizado via JS -->
+                </div>
+              </div>
+
+              <!-- TAB MOBILE 3: PERFIL & CONFIGURAÇÕES BÁSICAS -->
+              <div id="mobile-view-perfil" class="hidden space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 text-center space-y-2">
+                  <div class="user-avatar-initials w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-display font-extrabold text-lg flex items-center justify-center shadow">
+                    MS
+                  </div>
+                  <h3 class="user-fullname-sync font-display font-extrabold text-base text-slate-900 dark:text-white">Mariana Silva</h3>
+                  <p class="user-course-sync text-xs text-slate-500 dark:text-slate-400">Ciência da Computação</p>
+                </div>
+
+                <form onsubmit="saveMobileProfileSettings(event)" class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
+                  <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white">⚙️ Configurações Rápidas</h4>
+                  
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nome</label>
+                    <input type="text" id="mob-prof-name" value="Mariana Silva" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white" required />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Curso / Objetivo</label>
+                    <input type="text" id="mob-prof-course" value="Ciência da Computação" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white" />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Meta Diária (Horas)</label>
+                    <select id="mob-prof-goal" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white">
+                      <option value="2">2h / dia</option>
+                      <option value="3">3h / dia</option>
+                      <option value="4">4h / dia</option>
+                      <option value="5" selected>5h / dia</option>
+                      <option value="6">6h / dia</option>
+                    </select>
+                  </div>
+
+                  <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs cursor-pointer">
+                    Salvar no Perfil
+                  </button>
+                </form>
+
+                <button onclick="returnToWelcomeScreen()" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/15 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-200/70 dark:border-rose-500/30 cursor-pointer">
+                  🚪 Voltar para Tela Inicial
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Barra de Navegação Inferior Mobile (Bottom Nav) -->
+            <nav class="bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 px-3 py-2 grid grid-cols-4 gap-1 text-center">
+              <button onclick="setMobileTab('inicio')" data-mtab="inicio" class="mobile-nav-btn flex flex-col items-center py-1 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer">
+                <span>🏠</span>
+                <span>Início</span>
+              </button>
+              <button onclick="setMobileTab('agenda')" data-mtab="agenda" class="mobile-nav-btn flex flex-col items-center py-1 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-pointer">
+                <span>🗓️</span>
+                <span>Agenda</span>
+              </button>
+              <button onclick="openFlashcardModal()" class="flex flex-col items-center py-1 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-pointer">
+                <span>🧠</span>
+                <span>Revisar</span>
+              </button>
+              <button onclick="setMobileTab('perfil')" data-mtab="perfil" class="mobile-nav-btn flex flex-col items-center py-1 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-pointer">
+                <span>👤</span>
+                <span>Perfil</span>
+              </button>
+            </nav>
+
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. MODAL INTERATIVO DE FLASHCARDS (REVISÃO ESPAÇADA)                  -->
+  <!-- ===================================================================== -->
+  <div id="flashcard-modal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 fade-in-up">
+      <div class="flex items-center justify-between">
+        <span class="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
+          🧠 Revisão Rápida • Restam <span id="modal-cards-left">14</span>
+        </span>
+        <button onclick="closeFlashcardModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center font-bold cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- Cartão Pergunta / Resposta -->
+      <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-6 min-h-[190px] flex flex-col justify-center text-center space-y-3">
+        <span id="fc-subject" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Programação • Estrutura de Dados</span>
+        <p id="fc-question" class="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white">
+          Qual a complexidade de tempo média de busca em uma Tabela Hash bem distribuída?
+        </p>
+        <div id="fc-answer-box" class="hidden pt-3 border-t border-slate-200 dark:border-slate-700">
+          <p id="fc-answer" class="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400">
+            O(1) — Tempo constante, pois a função hash mapeia a chave diretamente para o índice.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controles do Flashcard -->
+      <div id="fc-reveal-btn-wrap">
+        <button onclick="revealFlashcardAnswer()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition cursor-pointer">
+          👁️ Mostrar Resposta
+        </button>
+      </div>
+
+      <div id="fc-rating-btns" class="hidden grid grid-cols-3 gap-2.5">
+        <button onclick="rateFlashcard('hard')" class="py-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold text-xs sm:text-sm border border-rose-200 dark:border-rose-500/30 cursor-pointer">
+          😓 Difícil (1d)
+        </button>
+        <button onclick="rateFlashcard('good')" class="py-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-xs sm:text-sm border border-amber-200 dark:border-amber-500/30 cursor-pointer">
+          🙂 Bom (4d)
+        </button>
+        <button onclick="rateFlashcard('easy')" class="py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-xs sm:text-sm border border-emerald-200 dark:border-emerald-500/30 cursor-pointer">
+          🚀 Fácil (9d)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. LÓGICA JAVASCRIPT SINCRONIZADA (LOGIN, PERFIL, DARK MODE, APP)     -->
+  <!-- ===================================================================== -->
+  <script>
+    // =========================================================================
+    // ESTADO GLOBAL DA APLICAÇÃO
+    // =========================================================================
+    const state = {
+      isDark: false,
+      viewMode: 'split', // 'desktop' | 'mobile' | 'split'
+      desktopTab: 'dashboard',
+      mobileTab: 'inicio',
+      authMode: 'password', // 'password' | 'nopassword'
+      user: {
+        name: 'Mariana Silva',
+        email: 'mariana.silva@estudaflow.com.br',
+        course: 'Ciência da Computação',
+        goalHours: 5,
+        avatarGradient: 'from-indigo-600 to-purple-600',
+        requirePassword: false,
+        password: ''
+      },
+      pomodoro: {
+        mode: 'focus', // 'focus' | 'break'
+        secondsLeft: 25 * 60,
+        totalSeconds: 25 * 60,
+        running: false,
+        intervalId: null,
+        cyclesCompleted: 3,
+        cyclesGoal: 4
+      },
+      flashcardsLeft: 14,
+      currentCardIndex: 0,
+      tasks: [
+        { id: 1, text: 'Resolver 15 exercícios de Álgebra Linear', subject: 'Matemática', done: true },
+        { id: 2, text: 'Implementar árvore binária de busca em Python', subject: 'Programação', done: true },
+        { id: 3, text: 'Resumir capítulo sobre Revolução Industrial', subject: 'História', done: false },
+        { id: 4, text: 'Praticar 20 min de listening técnico', subject: 'Inglês', done: false },
+        { id: 5, text: 'Escrever redação dissertativa sobre IA', subject: 'Redação', done: false }
+      ],
+      schedule: [
+        { id: 101, day: 'Seg', subject: 'Matemática', time: '08:00 - 09:30', done: true },
+        { id: 102, day: 'Seg', subject: 'Programação', time: '14:00 - 16:00', done: false },
+        { id: 103, day: 'Ter', subject: 'História', time: '09:00 - 10:30', done: true },
+        { id: 104, day: 'Ter', subject: 'Inglês', time: '16:00 - 17:00', done: false },
+        { id: 105, day: 'Qua', subject: 'Programação', time: '08:30 - 10:30', done: false },
+        { id: 106, day: 'Qui', subject: 'Matemática', time: '10:00 - 11:30', done: false },
+        { id: 107, day: 'Qui', subject: 'Redação', time: '15:00 - 16:30', done: false },
+        { id: 108, day: 'Sex', subject: 'Revisão Geral', time: '09:00 - 11:00', done: false }
+      ],
+      subjects: [
+        { name: 'Matemática', icon: '📐', hours: '18.5h', progress: 74, topics: '14/19 tópicos', color: 'indigo' },
+        { name: 'Programação', icon: '💻', hours: '24.0h', progress: 85, topics: '17/20 tópicos', color: 'emerald' },
+        { name: 'História', icon: '🏛️', hours: '11.0h', progress: 55, topics: '11/20 tópicos', color: 'amber' },
+        { name: 'Inglês', icon: '🌎', hours: '9.5h', progress: 68, topics: '13/19 tópicos', color: 'sky' },
+        { name: 'Redação', icon: '✍️', hours: '8.0h', progress: 60, topics: '6/10 redações', color: 'rose' }
+      ],
+      flashcardDeck: [
+        {
+          subject: 'Programação • Estrutura de Dados',
+          question: 'Qual a complexidade de tempo média de busca em uma Tabela Hash bem distribuída?',
+          answer: 'O(1) — Tempo constante, pois a função hash mapeia a chave diretamente para o índice.'
+        },
+        {
+          subject: 'Matemática • Álgebra Linear',
+          question: 'Quando uma matriz quadrada A possui inversa?',
+          answer: 'Quando seu determinante é diferente de zero (det(A) ≠ 0), ou seja, suas linhas/colunas são linearmente independentes.'
+        },
+        {
+          subject: 'História • Contemporânea',
+          question: 'Qual foi o principal combustível e inovação da Primeira Revolução Industrial?',
+          answer: 'O carvão mineral e o aperfeiçoamento da máquina a vapor por James Watt.'
+        }
+      ]
+    };
+
+    // =========================================================================
+    // 1. MODO ESCURO (DARK MODE)
+    // =========================================================================
+    function applyDarkMode(isDark) {
+      state.isDark = isDark;
+      const htmlEl = document.documentElement;
+      if (isDark) {
+        htmlEl.classList.add('dark');
+      } else {
+        htmlEl.classList.remove('dark');
+      }
+
+      document.querySelectorAll('.theme-icon-sync').forEach(el => {
+        el.textContent = isDark ? '☀️' : '🌙';
+      });
+      document.querySelectorAll('.theme-label-sync').forEach(el => {
+        el.textContent = isDark ? 'Modo Claro' : 'Modo Escuro';
+      });
+
+      try {
+        localStorage.setItem('estudaflow_dark', isDark ? '1' : '0');
+      } catch (e) {}
+    }
+
+    function toggleDarkMode() {
+      applyDarkMode(!state.isDark);
+    }
+
+    // =========================================================================
+    // 2. TELA INICIAL & AUTENTICAÇÃO (COM SENHA OU SEM SENHA)
+    // =========================================================================
+    function setAuthMode(mode) {
+      state.authMode = mode;
+      const tabSenha = document.getElementById('tab-login-senha');
+      const tabLivre = document.getElementById('tab-login-livre');
+      const passGroup = document.getElementById('password-field-group');
+      const optBadge = document.getElementById('pass-optional-badge');
+      const reqCheck = document.getElementById('login-require-pass-check');
+
+      if (mode === 'password') {
+        tabSenha.className = 'py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm';
+        tabLivre.className = 'py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 dark:text-slate-300';
+        passGroup.classList.remove('hidden');
+        optBadge.textContent = '(opcional ou crie sua senha agora)';
+      } else {
+        tabLivre.className = 'py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm';
+        tabSenha.className = 'py-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 dark:text-slate-300';
+        passGroup.classList.add('hidden');
+        reqCheck.checked = false;
+      }
+      document.getElementById('login-error-msg').classList.add('hidden');
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('login-pass-input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function handleWelcomeLogin(e) {
+      e.preventDefault();
+      const rawUser = document.getElementById('login-user-input').value.trim();
+      const rawPass = document.getElementById('login-pass-input').value;
+      const requirePass = document.getElementById('login-require-pass-check').checked;
+      const errEl = document.getElementById('login-error-msg');
+
+      // Se o usuário já definiu uma senha obrigatória anteriormente e tentou entrar sem ela ou errada:
+      if (state.authMode === 'password' && state.user.requirePassword && state.user.password) {
+        if (rawPass !== state.user.password) {
+          errEl.textContent = 'Senha incorreta. Digite a senha cadastrada ou entre no modo livre.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+      }
+
+      if (state.authMode === 'password' && requirePass && !rawPass) {
+        errEl.textContent = 'Digite uma senha para ativar a exigência de senha ou desmarque a opção.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+
+      // Atualiza nome/email a partir do que foi digitado
+      if (rawUser.includes('@')) {
+        state.user.email = rawUser;
+        const namePart = rawUser.split('@')[0].replace(/[._-]/g, ' ');
+        state.user.name = namePart.replace(/\b\w/g, l => l.toUpperCase());
+      } else if (rawUser) {
+        state.user.name = rawUser;
+      }
+
+      if (state.authMode === 'password' && rawPass) {
+        state.user.password = rawPass;
+        state.user.requirePassword = requirePass;
+      } else if (state.authMode === 'nopassword') {
+        state.user.requirePassword = false;
+      }
+
+      enterAppShell();
+    }
+
+    function enterAppWithoutPassword() {
+      const rawUser = document.getElementById('login-user-input').value.trim();
+      if (rawUser && !rawUser.includes('@')) {
+        state.user.name = rawUser;
+      }
+      state.user.requirePassword = false;
+      enterAppShell();
+    }
+
+    function enterAppShell() {
+      syncUserProfileUI();
+      document.getElementById('welcome-screen').classList.add('hidden');
+      const appShell = document.getElementById('app-shell');
+      appShell.classList.remove('hidden');
+      appShell.classList.add('flex');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function returnToWelcomeScreen() {
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('flex');
+      document.getElementById('welcome-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 3. SINCRONIZAÇÃO DE PERFIL & CONFIGURAÇÕES BÁSICAS
+    // =========================================================================
+    function getInitials(name) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function syncUserProfileUI() {
+      const firstName = state.user.name.trim().split(/\s+/)[0] || 'Estudante';
+      const initials = getInitials(state.user.name);
+
+      document.querySelectorAll('.user-firstname-sync').forEach(el => el.textContent = firstName);
+      document.querySelectorAll('.user-fullname-sync').forEach(el => el.textContent = state.user.name);
+      document.querySelectorAll('.user-email-sync').forEach(el => el.textContent = state.user.email);
+      document.querySelectorAll('.user-course-sync').forEach(el => el.textContent = state.user.course);
+      document.querySelectorAll('.user-goal-hours-sync').forEach(el => el.textContent = state.user.goalHours + 'h');
+
+      document.querySelectorAll('.user-avatar-initials').forEach(el => {
+        el.textContent = initials;
+      });
+
+      // Atualiza gradiente do avatar grande e da sidebar
+      const largeAvatar = document.getElementById('profile-large-avatar');
+      const sideAvatar = document.getElementById('sidebar-avatar-circle');
+      [largeAvatar, sideAvatar].forEach(el => {
+        if (el) {
+          el.className = `user-avatar-initials ${el.id === 'profile-large-avatar' ? 'w-16 h-16 rounded-2xl text-xl font-extrabold shadow-lg' : 'w-10 h-10 rounded-full text-xs font-bold shrink-0'} bg-gradient-to-tr ${state.user.avatarGradient} text-white font-display flex items-center justify-center`;
+        }
+      });
+
+      // Preenche os inputs do formulário de perfil (PC e Mobile)
+      document.getElementById('prof-input-name').value = state.user.name;
+      document.getElementById('prof-input-email').value = state.user.email;
+      document.getElementById('prof-input-course').value = state.user.course;
+      document.getElementById('prof-input-goal').value = String(state.user.goalHours);
+      document.getElementById('prof-require-password').checked = state.user.requirePassword;
+      document.getElementById('prof-input-password').value = state.user.password;
+
+      document.getElementById('mob-prof-name').value = state.user.name;
+      document.getElementById('mob-prof-course').value = state.user.course;
+      document.getElementById('mob-prof-goal').value = String(state.user.goalHours);
+
+      // Atualiza selos de segurança
+      const hasPass = Boolean(state.user.password && state.user.requirePassword);
+      const headerBadge = document.getElementById('header-auth-badge');
+      const profilePill = document.getElementById('profile-security-pill');
+      if (hasPass) {
+        headerBadge.textContent = '🔒 Protegido com Senha';
+        profilePill.textContent = '🔒 Senha Ativa';
+      } else {
+        headerBadge.textContent = '⚡ Acesso Livre';
+        profilePill.textContent = '⚡ Acesso sem Senha';
+      }
+
+      updateGoalProgress();
+    }
+
+    function setAvatarColor(gradientClass) {
+      state.user.avatarGradient = gradientClass;
+      syncUserProfileUI();
+    }
+
+    function saveProfileSettings(e) {
+      e.preventDefault();
+      state.user.name = document.getElementById('prof-input-name').value.trim() || 'Estudante';
+      state.user.email = document.getElementById('prof-input-email').value.trim();
+      state.user.course = document.getElementById('prof-input-course').value.trim() || 'Estudos Gerais';
+      state.user.goalHours = parseInt(document.getElementById('prof-input-goal').value, 10) || 5;
+      state.user.password = document.getElementById('prof-input-password').value;
+      state.user.requirePassword = document.getElementById('prof-require-password').checked && Boolean(state.user.password);
+
+      syncUserProfileUI();
+
+      const fb = document.getElementById('profile-save-feedback');
+      fb.classList.remove('opacity-0');
+      setTimeout(() => fb.classList.add('opacity-0'), 3000);
+    }
+
+    function saveMobileProfileSettings(e) {
+      e.preventDefault();
+      state.user.name = document.getElementById('mob-prof-name').value.trim() || 'Estudante';
+      state.user.course = document.getElementById('mob-prof-course').value.trim() || 'Estudos Gerais';
+      state.user.goalHours = parseInt(document.getElementById('mob-prof-goal').value, 10) || 5;
+      syncUserProfileUI();
+      setMobileTab('inicio');
+    }
+
+    function openProfileView() {
+      if (state.viewMode === 'mobile') {
+        setMobileTab('perfil');
+      } else {
+        setDesktopTab('perfil');
+      }
+    }
+
+    // =========================================================================
+    // 4. ALTERNÂNCIA DE DISPOSITIVOS E ABAS
+    // =========================================================================
+    function setViewMode(mode) {
+      state.viewMode = mode;
+      const desktopEl = document.getElementById('desktop-wrapper');
+      const mobileEl = document.getElementById('mobile-wrapper');
+
+      document.querySelectorAll('.device-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+        btn.classList.add('text-slate-300', 'hover:text-white');
+      });
+
+      const activeBtn = document.getElementById(`btn-mode-${mode}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        activeBtn.classList.remove('text-slate-300', 'hover:text-white');
+      }
+
+      if (mode === 'desktop') {
+        desktopEl.classList.remove('hidden');
+        mobileEl.classList.add('hidden');
+      } else if (mode === 'mobile') {
+        desktopEl.classList.add('hidden');
+        mobileEl.classList.remove('hidden');
+      } else {
+        desktopEl.classList.remove('hidden');
+        mobileEl.classList.remove('hidden');
+      }
+    }
+
+    function setDesktopTab(tabName) {
+      state.desktopTab = tabName;
+      const views = ['dashboard', 'cronograma', 'materias', 'revisoes', 'desempenho', 'perfil'];
+      views.forEach(v => {
+        const el = document.getElementById(`desktop-view-${v}`);
+        if (el) el.classList.toggle('hidden', v !== tabName);
+      });
+
+      document.querySelectorAll('.desktop-nav-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-dtab') === tabName;
+        if (isTarget) {
+          btn.className = 'desktop-nav-btn flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-sm font-bold bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 transition-all whitespace-nowrap cursor-pointer';
+        } else {
+          btn.className = 'desktop-nav-btn flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer';
+        }
+      });
+
+      const urlEl = document.getElementById('desktop-browser-url');
+      if (urlEl) urlEl.textContent = `app.estudaflow.com.br/${tabName}`;
+    }
+
+    function setMobileTab(tabName) {
+      state.mobileTab = tabName;
+      ['inicio', 'agenda', 'perfil'].forEach(v => {
+        const el = document.getElementById(`mobile-view-${v}`);
+        if (el) el.classList.toggle('hidden', v !== tabName);
+      });
+
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-mtab') === tabName;
+        btn.className = isTarget
+          ? 'mobile-nav-btn flex flex-col items-center py-1 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer'
+          : 'mobile-nav-btn flex flex-col items-center py-1 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-pointer';
+      });
+    }
+
+    // =========================================================================
+    // 5. TAREFAS, CRONOGRAMA E MATÉRIAS (SINCRONIZADOS)
+    // =========================================================================
+    function updateGoalProgress() {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.done).length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      const goalMinutes = state.user.goalHours * 60;
+      const completedMinutes = Math.round((pct / 100) * goalMinutes);
+      const hDone = Math.floor(completedMinutes / 60);
+      const mDone = String(completedMinutes % 60).padStart(2, '0');
+
+      document.getElementById('desktop-goal-percent').textContent = `${pct}%`;
+      document.getElementById('desktop-goal-bar').style.width = `${pct}%`;
+      document.getElementById('desktop-goal-text').textContent = `${hDone}h ${mDone}m de ${state.user.goalHours}h 00m concluídas`;
+      document.getElementById('desktop-tasks-summary').textContent = `${done}/${total} tarefas`;
+      document.getElementById('desktop-task-badge').textContent = `${done}/${total}`;
+
+      document.getElementById('mobile-goal-percent').textContent = `${pct}%`;
+      document.getElementById('mobile-goal-bar').style.width = `${pct}%`;
+      document.getElementById('mobile-task-badge').textContent = `${done}/${total}`;
+    }
+
+    function renderTasks() {
+      const desktopList = document.getElementById('desktop-task-list');
+      const mobileList = document.getElementById('mobile-task-list');
+
+      desktopList.innerHTML = state.tasks.map(task => `
+        <div class="flex items-center justify-between gap-3 p-3 rounded-xl border ${task.done ? 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-800' : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80'} transition">
+          <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0" />
+            <div class="min-w-0">
+              <p class="text-sm font-medium ${task.done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} truncate">${task.text}</p>
+              <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">${task.subject}</span>
+            </div>
+          </label>
+          <button onclick="deleteTask(${task.id})" class="text-slate-400 hover:text-rose-500 text-xs px-2 py-1 rounded-lg cursor-pointer" title="Excluir">✕</button>
+        </div>
+      `).join('');
+
+      mobileList.innerHTML = state.tasks.map(task => `
+        <div class="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+          <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 rounded text-indigo-600 cursor-pointer shrink-0" />
+            <span class="text-xs font-medium ${task.done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} truncate">${task.text}</span>
+          </label>
+          <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 shrink-0">${task.subject}</span>
+        </div>
+      `).join('');
+
+      updateGoalProgress();
+    }
+
+    function toggleTask(id) {
+      const item = state.tasks.find(t => t.id === id);
+      if (item) {
+        item.done = !item.done;
+        renderTasks();
+      }
+    }
+
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      renderTasks();
+    }
+
+    function handleAddTask(e, source) {
+      e.preventDefault();
+      const input = document.getElementById(`${source}-new-task-input`);
+      const subjEl = document.getElementById(`${source}-new-task-subject`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      state.tasks.unshift({
+        id: Date.now(),
+        text,
+        subject: subjEl ? subjEl.value : 'Geral',
+        done: false
+      });
+      input.value = '';
+      renderTasks();
+    }
+
+    function renderSchedule() {
+      const days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'];
+      const dashContainer = document.getElementById('desktop-dashboard-schedule');
+      const fullContainer = document.getElementById('desktop-full-schedule');
+      const mobContainer = document.getElementById('mobile-schedule-list');
+
+      const buildDayColumns = () => days.map(day => {
+        const blocks = state.schedule.filter(b => b.day === day);
+        return `
+          <div class="bg-slate-50/90 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200/70 dark:border-slate-700/70 flex flex-col gap-2">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 dark:border-slate-700">
+              <span class="font-display font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-200">${day}</span>
+              <span class="text-xs text-slate-400">${blocks.length}</span>
+            </div>
+            <div class="space-y-2">
+              ${blocks.map(b => `
+                <button onclick="toggleScheduleBlock(${b.id})" class="w-full text-left p-2.5 rounded-lg border transition cursor-pointer ${b.done ? 'bg-emerald-50/80 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30' : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-700 hover:border-indigo-400'}">
+                  <p class="text-xs font-bold ${b.done ? 'line-through text-emerald-700 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-100'}">${b.subject}</p>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${b.time}</p>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      dashContainer.innerHTML = buildDayColumns();
+      fullContainer.innerHTML = buildDayColumns();
+
+      mobContainer.innerHTML = state.schedule.map(b => `
+        <button onclick="toggleScheduleBlock(${b.id})" class="w-full text-left flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 cursor-pointer">
+          <div>
+            <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">${b.day} • ${b.time}</span>
+            <p class="text-sm font-bold ${b.done ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}">${b.subject}</p>
+          </div>
+          <span class="text-sm">${b.done ? '✅' : '⭕'}</span>
+        </button>
+      `).join('');
+    }
+
+    function toggleScheduleBlock(id) {
+      const blk = state.schedule.find(b => b.id === id);
+      if (blk) {
+        blk.done = !blk.done;
+        renderSchedule();
+      }
+    }
+
+    function handleAddScheduleBlock(e) {
+      e.preventDefault();
+      const day = document.getElementById('sched-day').value;
+      const subject = document.getElementById('sched-subject').value;
+      const time = document.getElementById('sched-time').value.trim();
+      if (!time) return;
+
+      state.schedule.push({
+        id: Date.now(),
+        day,
+        subject,
+        time,
+        done: false
+      });
+      renderSchedule();
+    }
+
+    function renderSubjects() {
+      const grid = document.getElementById('desktop-subjects-grid');
+      grid.innerHTML = state.subjects.map(s => `
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-soft space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 flex items-center justify-center text-xl">${s.icon}</span>
+              <div>
+                <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">${s.name}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">${s.topics}</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${s.hours}</span>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Progresso do edital</span>
+              <span class="text-indigo-600 dark:text-indigo-400">${s.progress}%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 rounded-full" style="width: ${s.progress}%"></div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // 6. TIMER POMODORO INTERATIVO
+    // =========================================================================
+    function updatePomodoroUI() {
+      const mins = String(Math.floor(state.pomodoro.secondsLeft / 60)).padStart(2, '0');
+      const secs = String(state.pomodoro.secondsLeft % 60).padStart(2, '0');
+      const formatted = `${mins}:${secs}`;
+
+      document.getElementById('desktop-pomo-time').textContent = formatted;
+      document.getElementById('mobile-pomo-time').textContent = formatted;
+
+      const label = state.pomodoro.mode === 'focus' ? 'Foco' : 'Pausa';
+      document.getElementById('desktop-pomo-status-label').textContent = label;
+
+      const btnText = state.pomodoro.running ? '⏸ Pausar' : '▶ Iniciar';
+      document.getElementById('desktop-pomo-toggle').innerHTML = `<span>${btnText}</span>`;
+      document.getElementById('mobile-pomo-toggle').textContent = btnText;
+
+      // Atualiza anel SVG
+      const circumference = 263.89;
+      const ratio = state.pomodoro.secondsLeft / state.pomodoro.totalSeconds;
+      const offset = circumference * (1 - ratio);
+      const ring = document.getElementById('desktop-pomo-ring');
+      if (ring) {
+        ring.style.strokeDashoffset = offset;
+        ring.style.stroke = state.pomodoro.mode === 'focus' ? '#4F46E5' : '#10B981';
+      }
+
+      // Estilo dos botões Foco / Pausa
+      const btnFocus = document.getElementById('desktop-btn-mode-focus');
+      const btnBreak = document.getElementById('desktop-btn-mode-break');
+      if (state.pomodoro.mode === 'focus') {
+        btnFocus.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 cursor-pointer';
+        btnBreak.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
+      } else {
+        btnBreak.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 cursor-pointer';
+        btnFocus.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
+      }
+    }
+
+    function setPomodoroMode(mode) {
+      pausePomodoro();
+      state.pomodoro.mode = mode;
+      state.pomodoro.totalSeconds = mode === 'focus' ? 25 * 60 : 5 * 60;
+      state.pomodoro.secondsLeft = state.pomodoro.totalSeconds;
+      updatePomodoroUI();
+    }
+
+    function togglePomodoro() {
+      if (state.pomodoro.running) {
+        pausePomodoro();
+      } else {
+        state.pomodoro.running = true;
+        updatePomodoroUI();
+        state.pomodoro.intervalId = setInterval(() => {
+          if (state.pomodoro.secondsLeft > 0) {
+            state.pomodoro.secondsLeft--;
+            updatePomodoroUI();
+          } else {
+            pausePomodoro();
+            if (state.pomodoro.mode === 'focus') {
+              state.pomodoro.cyclesCompleted++;
+              document.getElementById('desktop-pomo-cycles').textContent = `${state.pomodoro.cyclesCompleted} de ${state.pomodoro.cyclesGoal} sessões`;
+              setPomodoroMode('break');
+            } else {
+              setPomodoroMode('focus');
+            }
+          }
+        }, 1000);
+      }
+    }
+
+    function pausePomodoro() {
+      state.pomodoro.running = false;
+      if (state.pomodoro.intervalId) {
+        clearInterval(state.pomodoro.intervalId);
+        state.pomodoro.intervalId = null;
+      }
+      updatePomodoroUI();
+    }
+
+    function resetPomodoro() {
+      pausePomodoro();
+      state.pomodoro.secondsLeft = state.pomodoro.totalSeconds;
+      updatePomodoroUI();
+    }
+
+    // =========================================================================
+    // 7. MODAL DE FLASHCARDS (SRS)
+    // =========================================================================
+    function openFlashcardModal() {
+      loadFlashcard();
+      document.getElementById('flashcard-modal').classList.remove('hidden');
+    }
+
+    function closeFlashcardModal() {
+      document.getElementById('flashcard-modal').classList.add('hidden');
+    }
+
+    function loadFlashcard() {
+      const card = state.flashcardDeck[state.currentCardIndex % state.flashcardDeck.length];
+      document.getElementById('fc-subject').textContent = card.subject;
+      document.getElementById('fc-question').textContent = card.question;
+      document.getElementById('fc-answer').textContent = card.answer;
+      document.getElementById('modal-cards-left').textContent = state.flashcardsLeft;
+
+      document.getElementById('fc-answer-box').classList.add('hidden');
+      document.getElementById('fc-reveal-btn-wrap').classList.remove('hidden');
+      document.getElementById('fc-rating-btns').classList.add('hidden');
+    }
+
+    function revealFlashcardAnswer() {
+      document.getElementById('fc-answer-box').classList.remove('hidden');
+      document.getElementById('fc-reveal-btn-wrap').classList.add('hidden');
+      document.getElementById('fc-rating-btns').classList.remove('hidden');
+    }
+
+    function rateFlashcard() {
+      if (state.flashcardsLeft > 0) {
+        state.flashcardsLeft--;
+      }
+      state.currentCardIndex++;
+      document.getElementById('desktop-flashcard-count').textContent = state.flashcardsLeft;
+      document.getElementById('mobile-flashcard-count').textContent = state.flashcardsLeft;
+      document.getElementById('sidebar-flashcard-badge').textContent = state.flashcardsLeft;
+      const revEl = document.getElementById('revisoes-view-count');
+      if (revEl) revEl.textContent = state.flashcardsLeft;
+
+      if (state.flashcardsLeft === 0) {
+        closeFlashcardModal();
+      } else {
+        loadFlashcard();
+      }
+    }
+
+    // =========================================================================
+    // 8. INICIALIZAÇÃO
+    // =========================================================================
+    (function init() {
+      try {
+        const savedDark = localStorage.getItem('estudaflow_dark');
+        if (savedDark === '1') applyDarkMode(true);
+      } catch (e) {}
+
+      setViewMode('split');
+      setDesktopTab('dashboard');
+      setMobileTab('inicio');
+      renderTasks();
+      renderSchedule();
+      renderSubjects();
+      updatePomodoroUI();
+      syncUserProfileUI();
+    })();
+  </script>
+</body>
+</html>
